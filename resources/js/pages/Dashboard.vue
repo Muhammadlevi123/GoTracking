@@ -1,36 +1,25 @@
-<script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
-import PlaceholderPattern from '../components/PlaceholderPattern.vue';
+<script setup>
+import { router, usePage } from '@inertiajs/vue3'
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-];
+// Ambil user dari props inertia
+const user = usePage().props.auth.user
+
+// Fungsi logout
+const logout = () => {
+  router.post(route('logout'), {}, { preserveScroll: true })
+}
 </script>
 
 <template>
-    <Head title="Dashboard" />
+  <div class="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-white flex flex-col items-center justify-center px-4">
+    <h1 class="text-2xl font-semibold mb-4">Selamat Datang, {{ user.name }}</h1>
+    <p class="mb-6">Anda login sebagai <strong>{{ user.role }}</strong></p>
 
-    <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-            <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-                <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-                <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-            </div>
-            <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                <PlaceholderPattern />
-            </div>
-        </div>
-    </AppLayout>
+    <button
+      @click="logout"
+      class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition"
+    >
+      Logout
+    </button>
+  </div>
 </template>
