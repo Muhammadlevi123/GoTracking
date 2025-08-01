@@ -5,8 +5,8 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
-})->name('home');
+    return Inertia::render('Dashboard');
+})->name('user.dashboard');
 
 // User Dashboard Route
 Route::get('user/dashboard', function () {
