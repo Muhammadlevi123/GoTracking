@@ -1,33 +1,112 @@
 <script setup lang="ts">
 import { type User } from '@/types';
 import { usePage, Link, router } from '@inertiajs/vue3';
-import { ChevronDown, Menu, X, User as UserIcon } from 'lucide-vue-next';
+import {
+    ChevronDown,
+    Menu,
+    X,
+    User as UserIcon,
+    Settings,
+    LogOut,
+    Sun,
+    Moon,
+    Monitor,
+    Bell,
+    Search,
+    Sparkles,
+    Zap
+} from 'lucide-vue-next';
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 
 const page = usePage();
-// Gunakan computed untuk reactivity yang lebih baik
 const user = computed(() => page.props.auth?.user as User | null);
 const isMobileMenuOpen = ref(false);
 const isUserDropdownOpen = ref(false);
+const isThemeDropdownOpen = ref(false);
+const isSearchOpen = ref(false);
+const currentTheme = ref('system');
+const searchQuery = ref('');
+
+// Theme management with enhanced animation
+const themes = [
+    { value: 'light', label: 'Light', icon: Sun, color: 'from-yellow-400 to-orange-500' },
+    { value: 'dark', label: 'Dark', icon: Moon, color: 'from-purple-600 to-blue-600' },
+    { value: 'system', label: 'Auto', icon: Monitor, color: 'from-gray-500 to-gray-700' }
+];
+
+const initializeTheme = () => {
+    const savedTheme = localStorage.getItem('theme') || 'system';
+    currentTheme.value = savedTheme;
+    applyTheme(savedTheme);
+};
+
+const applyTheme = (theme: string) => {
+    const html = document.documentElement;
+
+    if (theme === 'system') {
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        html.setAttribute('data-theme', systemPrefersDark ? 'dark' : 'light');
+    } else {
+        html.setAttribute('data-theme', theme);
+    }
+
+    localStorage.setItem('theme', theme);
+    currentTheme.value = theme;
+};
+
+const toggleTheme = (theme: string) => {
+    applyTheme(theme);
+    closeAllDropdowns();
+};
 
 const toggleMobileMenu = () => {
     isMobileMenuOpen.value = !isMobileMenuOpen.value;
+    if (isMobileMenuOpen.value) {
+        closeOtherDropdowns('mobile');
+    }
 };
 
 const toggleUserDropdown = () => {
     isUserDropdownOpen.value = !isUserDropdownOpen.value;
+    if (isUserDropdownOpen.value) {
+        closeOtherDropdowns('user');
+    }
 };
 
-// Handle logout dengan cara yang lebih eksplisit
-const handleLogout = () => {
-    // Tutup semua dropdown/menu
-    isMobileMenuOpen.value = false;
-    isUserDropdownOpen.value = false;
+const toggleThemeDropdown = () => {
+    isThemeDropdownOpen.value = !isThemeDropdownOpen.value;
+    if (isThemeDropdownOpen.value) {
+        closeOtherDropdowns('theme');
+    }
+};
 
-    // Lakukan logout dengan redirect eksplisit
+const toggleSearch = () => {
+    isSearchOpen.value = !isSearchOpen.value;
+    if (isSearchOpen.value) {
+        closeOtherDropdowns('search');
+        // Focus search input after animation
+        setTimeout(() => {
+            const searchInput = document.querySelector('#search-input') as HTMLInputElement;
+            searchInput?.focus();
+        }, 150);
+    }
+};
+
+const closeOtherDropdowns = (except?: string) => {
+    if (except !== 'mobile') isMobileMenuOpen.value = false;
+    if (except !== 'user') isUserDropdownOpen.value = false;
+    if (except !== 'theme') isThemeDropdownOpen.value = false;
+    if (except !== 'search') isSearchOpen.value = false;
+};
+
+const closeAllDropdowns = () => {
+    closeOtherDropdowns();
+};
+
+const handleLogout = () => {
+    closeAllDropdowns();
     router.post(route('logout'), {}, {
         onSuccess: () => {
-            // Redirect ke halaman home atau login setelah logout berhasil
             router.visit('/', { replace: true });
         },
         onError: (errors) => {
@@ -36,233 +115,475 @@ const handleLogout = () => {
     });
 };
 
+const handleSearch = () => {
+    if (searchQuery.value.trim()) {
+        console.log('Searching for:', searchQuery.value);
+        // Implement search logic here
+        closeAllDropdowns();
+    }
+};
+
 // Close dropdowns when clicking outside
 const handleClickOutside = (event: Event) => {
     const target = event.target as HTMLElement;
-    if (!target.closest('.user-dropdown-container')) {
-        isUserDropdownOpen.value = false;
+    if (!target.closest('.navbar-dropdown') && !target.closest('.navbar-btn')) {
+        closeAllDropdowns();
     }
-    if (!target.closest('.mobile-menu-container')) {
-        isMobileMenuOpen.value = false;
+};
+
+// Handle system theme changes
+const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+    if (currentTheme.value === 'system') {
+        applyTheme('system');
     }
 };
 
 onMounted(() => {
+    initializeTheme();
     document.addEventListener('click', handleClickOutside);
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+
+    const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+            closeAllDropdowns();
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
 });
 
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.removeEventListener('change', handleSystemThemeChange);
 });
+
+// Navigation items with icons
+const navigationItems = [
+    { name: 'Home', href: '#', authOnly: false },
+    { name: 'About', href: '#', authOnly: false },
+    { name: 'Map', href: '#', authOnly: false, icon: Sparkles },
+    { name: 'Statistik', href: '#', authOnly: true },
+    { name: 'Laporan', href: '#', authOnly: true },
+];
+
+const userMenuItems = [
+    { name: 'Profile Settings', href: 'profile.edit', icon: UserIcon, desc: 'Manage your account' }
+];
 </script>
 
 <template>
-    <!-- Universal Navbar - Clean & Modern -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 dark:bg-gray-900/90 dark:border-gray-700">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo/Brand -->
-                <div class="flex items-center">
-                    <Link :href="user ? route('user.dashboard') : '/'" class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <span class="text-white font-bold text-sm">L</span>
+    <!-- Ultra Modern Glassmorphic Navbar -->
+    <div class="navbar bg-base-100/60 backdrop-blur-xl border-b border-base-content/10 fixed top-0 z-50 shadow-2xl shadow-base-content/5">
+        <div class="navbar-start">
+            <!-- Mobile menu button with enhanced animation -->
+            <div class="lg:hidden">
+                <button
+                    @click="toggleMobileMenu"
+                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95"
+                    :class="{ 'bg-base-content/10': isMobileMenuOpen }"
+                >
+                    <Menu v-if="!isMobileMenuOpen" class="w-5 h-5 transition-transform duration-300" />
+                    <X v-else class="w-5 h-5 transition-transform duration-300 rotate-90" />
+                </button>
+
+                <!-- Enhanced Mobile Sliding Menu -->
+                <div
+                    v-if="isMobileMenuOpen"
+                    class="navbar-dropdown fixed inset-0 top-16 bg-base-100/95 backdrop-blur-xl z-40 animate-slide-in-left"
+                >
+                    <div class="p-6 space-y-6 max-w-sm">
+                        <!-- User profile card for mobile -->
+                        <div v-if="user" class="card bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm border border-base-content/10">
+                            <div class="card-body p-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="avatar">
+                                        <div class="w-16 rounded-full bg-gradient-to-br from-primary to-secondary p-0.5">
+                                            <div class="w-full h-full bg-base-100 rounded-full flex items-center justify-center">
+                                                <span class="text-xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">
+                                                    {{ user.name.charAt(0).toUpperCase() }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="font-bold text-lg">{{ user.name }}</h3>
+                                        <p class="text-sm opacity-70">{{ user.email }}</p>
+                                        <div class="badge badge-primary badge-sm mt-1 capitalize">{{ user.role }}</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <span class="font-semibold text-gray-900 dark:text-white">
-                            Laravel App
-                        </span>
-                    </Link>
-                </div>
 
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <!-- Navigation Links (for authenticated users) -->
-                    <nav v-if="user" class="flex items-center space-x-6">
-                        <Link :href="route('user.dashboard')"
-                            class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">
-                            Dashboard
-                        </Link>
-                        <Link href="#"
-                            class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">
-                            Features
-                        </Link>
-                        <Link href="#"
-                            class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">
-                            About
-                        </Link>
-                    </nav>
+                        <!-- Navigation items -->
+                        <div class="space-y-2">
+                            <template v-for="item in navigationItems" :key="item.name">
+                                <Link
+                                    v-if="!item.authOnly || user"
+                                    :href="item.href.startsWith('#') ? item.href : route(item.href)"
+                                    class="btn btn-ghost w-full justify-start gap-3 text-lg hover:bg-base-content/10 transition-all duration-300"
+                                    @click="closeAllDropdowns"
+                                >
+                                    <component v-if="item.icon" :is="item.icon" class="w-5 h-5" />
+                                    {{ item.name }}
+                                </Link>
+                            </template>
+                        </div>
 
-                    <!-- User Profile Dropdown (Authenticated) -->
-                    <div v-if="user" class="relative user-dropdown-container">
-                        <button
-                            @click="toggleUserDropdown"
-                            class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                            <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                                <span class="text-blue-600 dark:text-blue-400 font-semibold text-sm">
-                                    {{ user.name.charAt(0).toUpperCase() }}
-                                </span>
+                        <!-- Theme selector -->
+                        <div class="space-y-2">
+                            <p class="text-sm font-medium opacity-70">Theme</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button
+                                    v-for="theme in themes"
+                                    :key="theme.value"
+                                    @click="toggleTheme(theme.value)"
+                                    class="btn btn-sm gap-2 transition-all duration-300"
+                                    :class="currentTheme === theme.value
+                                        ? 'btn-primary'
+                                        : 'btn-ghost hover:bg-base-content/10'"
+                                >
+                                    <component :is="theme.icon" class="w-4 h-4" />
+                                    {{ theme.label }}
+                                </button>
                             </div>
-                            <span class="text-gray-700 dark:text-gray-300 font-medium text-sm hidden lg:block">
-                                {{ user.name }}
-                            </span>
-                            <ChevronDown class="w-4 h-4 text-gray-500 transition-transform duration-200"
-                                :class="{ 'rotate-180': isUserDropdownOpen }" />
-                        </button>
+                        </div>
 
-                        <!-- User Dropdown Menu -->
-                        <Transition
-                            enter-active-class="transition ease-out duration-200"
-                            enter-from-class="opacity-0 scale-95"
-                            enter-to-class="opacity-100 scale-100"
-                            leave-active-class="transition ease-in duration-150"
-                            leave-from-class="opacity-100 scale-100"
-                            leave-to-class="opacity-0 scale-95"
-                        >
-                            <div
-                                v-show="isUserDropdownOpen"
-                                class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2">
-                                <!-- User Info -->
-                                <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                                    <p class="font-semibold text-gray-900 dark:text-white">{{ user.name }}</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</p>
-                                    <span class="inline-block mt-1 px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full capitalize">
-                                        {{ user.role }}
-                                    </span>
-                                </div>
-
-                                <!-- Menu Items -->
-                                <div class="py-1">
-                                    <Link :href="route('profile.edit')"
-                                        class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                        <UserIcon class="w-4 h-4 mr-3" />
-                                        Profile Settings
-                                    </Link>
-                                    <Link :href="route('user.dashboard')"
-                                        class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-                                        </svg>
-                                        Dashboard
-                                    </Link>
-                                    <Link href="#"
-                                        class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                        </svg>
-                                        Settings
-                                    </Link>
-                                </div>
-
-                                <!-- Logout dengan handler khusus -->
-                                <div class="border-t border-gray-100 dark:border-gray-700">
-                                    <button
-                                        @click="handleLogout"
-                                        class="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                        </svg>
-                                        Sign Out
-                                    </button>
-                                </div>
-                            </div>
-                        </Transition>
+                        <!-- Auth actions -->
+                        <div class="space-y-2 pt-4 border-t border-base-content/10">
+                            <template v-if="user">
+                                <Link
+                                    v-for="item in userMenuItems"
+                                    :key="item.name"
+                                    :href="route(item.href)"
+                                    class="btn btn-ghost w-full justify-start gap-3"
+                                    @click="closeAllDropdowns"
+                                >
+                                    <component :is="item.icon" class="w-5 h-5" />
+                                    {{ item.name }}
+                                </Link>
+                                <button
+                                    @click="handleLogout"
+                                    class="btn btn-error btn-outline w-full gap-3"
+                                >
+                                    <LogOut class="w-5 h-5" />
+                                    Sign Out
+                                </button>
+                            </template>
+                            <template v-else>
+                                <Link :href="route('login')" class="btn btn-ghost w-full" @click="closeAllDropdowns">
+                                    Sign In
+                                </Link>
+                                <Link :href="route('register')" class="btn btn-primary w-full" @click="closeAllDropdowns">
+                                    Get Started
+                                </Link>
+                            </template>
+                        </div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Guest Navigation -->
-                    <nav v-else class="flex items-center space-x-4">
-                        <Link :href="route('login')"
-                            class="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-4 py-2 text-sm font-medium transition-colors">
-                            Sign In
+            <!-- Enhanced Brand/Logo -->
+            <Link
+                :href="user ? route('user.dashboard') : '/'"
+                class="btn btn-ghost hover:bg-transparent group transition-all duration-300 px-2"
+            >
+            <div class="ml-2 px-2 py-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full group-hover:from-primary/30 group-hover:to-secondary/30 transition-all duration-300">
+                    <span class="text-lg font-bold text-primary  transition-colors duration-300">
+                        Go
+                    </span>
+                </div>
+                <span class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text  group-hover:scale-105 transition-all duration-300 tracking-tight">
+                    Tracking
+                </span>
+            </Link>
+        </div>
+
+        <!-- Desktop Navigation with enhanced styling -->
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal gap-1">
+                <template v-for="item in navigationItems" :key="item.name">
+                    <li v-if="!item.authOnly || user">
+                        <Link
+                            :href="item.href.startsWith('#') ? item.href : route(item.href)"
+                            class="font-medium hover:bg-base-content/10 transition-all duration-300 rounded-xl gap-2 hover:scale-105 active:scale-95"
+                        >
+                            <component v-if="item.icon" :is="item.icon" class="w-4 h-4" />
+                            {{ item.name }}
                         </Link>
-                        <Link :href="route('register')"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                            Get Started
-                        </Link>
-                    </nav>
+                    </li>
+                </template>
+            </ul>
+        </div>
+
+        <div class="navbar-end gap-2">
+            <!-- Enhanced Search -->
+            <div class="relative">
+                <!-- Search toggle button -->
+                <button
+                    @click="toggleSearch"
+                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 lg:hidden"
+                    :class="{ 'bg-base-content/10': isSearchOpen }"
+                >
+                    <Search class="w-5 h-5" />
+                </button>
+
+                <!-- Desktop search bar (always visible) -->
+                <div class="hidden lg:flex items-center">
+                    <div class="form-control">
+                        <div class="input-group">
+                            <input
+                                v-model="searchQuery"
+                                type="text"
+                                placeholder="Search..."
+                                class="input input-sm w-32 bg-base-100/50 backdrop-blur-sm border-base-content/20 focus:border-primary focus:w-64 transition-all duration-300 mr-5"
+                                @keyup.enter="handleSearch"
+                            />
+                            <button
+                                @click="handleSearch"
+                                class="btn btn-sm btn-primary"
+                            >
+                                <Search class="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Mobile menu button -->
-                <div class="md:hidden mobile-menu-container">
+                <!-- Mobile search dropdown -->
+                <div
+                    v-if="isSearchOpen"
+                    class="navbar-dropdown absolute right-0 top-full mt-2 w-80 bg-base-100/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-base-content/10 p-4 animate-scale-in lg:hidden"
+                >
+                    <div class="form-control">
+                        <div class="input-group">
+                            <input
+                                id="search-input"
+                                v-model="searchQuery"
+                                type="text"
+                                placeholder="Search anything..."
+                                class="input input-bordered w-full bg-base-100/50 backdrop-blur-sm border-base-content/20 focus:border-primary"
+                                @keyup.enter="handleSearch"
+                            />
+                            <button
+                                @click="handleSearch"
+                                class="btn btn-primary"
+                            >
+                                <Search class="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications (if user is authenticated) -->
+            <button
+                v-if="user"
+                class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 indicator"
+            >
+                <span class="indicator-item badge badge-secondary badge-xs"></span>
+                <Bell class="w-5 h-5" />
+            </button>
+
+            <!-- Enhanced Theme Toggle -->
+            <div class="relative">
+                <button
+                    @click="toggleThemeDropdown"
+                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95"
+                    :class="{ 'bg-base-content/10': isThemeDropdownOpen }"
+                >
+                    <component :is="themes.find(t => t.value === currentTheme)?.icon || Monitor" class="w-5 h-5" />
+                </button>
+
+                <div
+                    v-if="isThemeDropdownOpen"
+                    class="navbar-dropdown absolute right-0 top-full mt-2 w-48 bg-base-100/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-base-content/10 p-2 animate-scale-in"
+                >
                     <button
-                        @click="toggleMobileMenu"
-                        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <Menu v-if="!isMobileMenuOpen" class="w-6 h-6 text-gray-700 dark:text-gray-300" />
-                        <X v-else class="w-6 h-6 text-gray-700 dark:text-gray-300" />
+                        v-for="theme in themes"
+                        :key="theme.value"
+                        @click="toggleTheme(theme.value)"
+                        class="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 hover:bg-base-content/10"
+                        :class="currentTheme === theme.value ? 'bg-primary text-primary-content' : ''"
+                    >
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center"
+                             :class="currentTheme === theme.value ? 'bg-primary-content/20' : 'bg-base-content/10'">
+                            <component :is="theme.icon" class="w-4 h-4" />
+                        </div>
+                        <span class="font-medium">{{ theme.label }}</span>
                     </button>
                 </div>
             </div>
-        </div>
 
-        <!-- Mobile Navigation Menu -->
-        <Transition
-            enter-active-class="transition ease-out duration-200"
-            enter-from-class="opacity-0 -translate-y-1"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition ease-in duration-150"
-            leave-from-class="opacity-100 translate-y-0"
-            leave-to-class="opacity-0 -translate-y-1"
-        >
-            <div v-show="isMobileMenuOpen" class="md:hidden border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900">
-                <div class="px-4 py-6 space-y-4">
-                    <!-- Authenticated Mobile Menu -->
-                    <template v-if="user">
-                        <!-- User Info Section -->
-                        <div class="flex items-center space-x-3 pb-4 border-b border-gray-100 dark:border-gray-700">
-                            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                                <span class="text-blue-600 dark:text-blue-400 font-semibold">
-                                    {{ user.name.charAt(0).toUpperCase() }}
-                                </span>
+            <!-- Enhanced User Menu -->
+            <div v-if="user" class="relative">
+                <button
+                    @click="toggleUserDropdown"
+                    class="navbar-btn btn btn-ghost btn-circle avatar hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 p-1"
+                    :class="{ 'bg-base-content/10': isUserDropdownOpen }"
+                >
+                    <div class="w-10 rounded-full bg-gradient-to-br from-primary to-secondary p-0.5">
+                        <div class="w-full h-full bg-base-100 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">
+                                {{ user.name.charAt(0).toUpperCase() }}
+                            </span>
+                        </div>
+                    </div>
+                </button>
+
+                <div
+                    v-if="isUserDropdownOpen"
+                    class="navbar-dropdown absolute right-0 top-full mt-2 w-80 bg-base-100/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-base-content/10 p-4 animate-scale-in"
+                >
+                    <!-- User info header -->
+                    <div class="flex items-center gap-4 p-3 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl mb-4">
+                        <div class="avatar">
+                            <div class="w-12 rounded-full bg-gradient-to-br from-primary to-secondary p-0.5">
+                                <div class="w-full h-full bg-base-100 rounded-full flex items-center justify-center">
+                                    <span class="font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">
+                                        {{ user.name.charAt(0).toUpperCase() }}
+                                    </span>
+                                </div>
                             </div>
-                            <div>
-                                <div class="font-semibold text-gray-900 dark:text-white">{{ user.name }}</div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</div>
-                                <span class="inline-block mt-1 px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full capitalize">
-                                    {{ user.role }}
-                                </span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold">{{ user.name }}</h3>
+                            <p class="text-sm opacity-70">{{ user.email }}</p>
+                            <div class="badge badge-primary badge-sm mt-1 capitalize">{{ user.role }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Menu items -->
+                    <div class="space-y-1">
+                        <Link
+                            v-for="item in userMenuItems"
+                            :key="item.name"
+                            :href="route(item.href)"
+                            class="flex items-center gap-3 p-3 rounded-xl transition-all duration-300 hover:bg-base-content/10 group"
+                            @click="closeAllDropdowns"
+                        >
+                            <div class="w-8 h-8 rounded-lg bg-base-content/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-content transition-all duration-300">
+                                <component :is="item.icon" class="w-4 h-4" />
                             </div>
-                        </div>
+                            <div class="flex-1">
+                                <p class="font-medium">{{ item.name }}</p>
+                                <p class="text-xs opacity-60">{{ item.desc }}</p>
+                            </div>
+                        </Link>
+                    </div>
 
-                        <!-- Navigation Links -->
-                        <div class="space-y-2">
-                            <Link :href="route('user.dashboard')"
-                                class="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
-                                Dashboard
-                            </Link>
-                            <Link href="#"
-                                class="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
-                                Features
-                            </Link>
-                            <Link href="#"
-                                class="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
-                                About
-                            </Link>
-                            <Link :href="route('profile.edit')"
-                                class="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
-                                Profile Settings
-                            </Link>
-                            <!-- Mobile logout dengan handler khusus -->
-                            <button
-                                @click="handleLogout"
-                                class="block w-full text-left px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
-                                Sign Out
-                            </button>
-                        </div>
-                    </template>
+                    <div class="divider my-2"></div>
 
-                    <!-- Guest Mobile Menu -->
-                    <template v-else>
-                        <div class="space-y-4">
-                            <Link :href="route('login')"
-                                class="block w-full text-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
-                                Sign In
-                            </Link>
-                            <Link :href="route('register')"
-                                class="block w-full text-center px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
-                                Get Started
-                            </Link>
+                    <!-- Logout -->
+                    <button
+                        @click="handleLogout"
+                        class="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 hover:bg-error/10 text-error group"
+                    >
+                        <div class="w-8 h-8 rounded-lg bg-error/10 flex items-center justify-center group-hover:bg-error group-hover:text-error-content transition-all duration-300">
+                            <LogOut class="w-4 h-4" />
                         </div>
-                    </template>
+                        <span class="font-medium">Sign Out</span>
+                    </button>
                 </div>
             </div>
-        </Transition>
-    </header>
+
+            <!-- Enhanced Guest Actions -->
+            <template v-else>
+                <Link :href="route('login')" class="btn btn-sm btn-ghost font-medium hover:bg-base-content/10 transition-all duration-300 hover:scale-105 active:scale-95">
+                    Sign In
+                </Link>
+                <Link :href="route('register')" class="btn btn-sm btn-primary hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    Get Started
+                </Link>
+            </template>
+        </div>
+    </div>
+
+    <!-- Spacer -->
+    <div class="h-16"></div>
 </template>
+
+<style scoped>
+/* Enhanced animations */
+@keyframes slide-in-left {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slide-in-top {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.animate-slide-in-left {
+    animation: slide-in-left 0.3s ease-out;
+}
+
+.animate-slide-in-top {
+    animation: slide-in-top 0.2s ease-out;
+}
+
+.animate-scale-in {
+    animation: scale-in 0.2s ease-out;
+}
+
+/* Enhanced backdrop blur */
+.navbar {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* Custom scrollbar */
+.navbar-dropdown {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(var(--bc) / 0.2) transparent;
+}
+
+.navbar-dropdown::-webkit-scrollbar {
+    width: 4px;
+}
+
+.navbar-dropdown::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.navbar-dropdown::-webkit-scrollbar-thumb {
+    background: oklch(var(--bc) / 0.2);
+    border-radius: 2px;
+}
+
+/* Gradient text support */
+.bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* Enhanced focus states */
+.navbar-btn:focus-visible {
+    outline: 2px solid oklch(var(--p));
+    outline-offset: 2px;
+}
+</style>
