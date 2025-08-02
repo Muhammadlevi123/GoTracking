@@ -14,7 +14,14 @@ import {
     Bell,
     Search,
     Sparkles,
-    Zap
+    Zap,
+    MapPin,
+    BarChart3,
+    FileText,
+    Check,
+    Clock,
+    AlertTriangle,
+    Info
 } from 'lucide-vue-next';
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 
@@ -24,8 +31,69 @@ const isMobileMenuOpen = ref(false);
 const isUserDropdownOpen = ref(false);
 const isThemeDropdownOpen = ref(false);
 const isSearchOpen = ref(false);
+const isNotificationOpen = ref(false);
 const currentTheme = ref('system');
 const searchQuery = ref('');
+
+// Notification system
+const notifications = ref([
+    {
+        id: 1,
+        type: 'success',
+        title: 'Map Updated',
+        message: 'New location data has been added to the tracking map',
+        time: '2 minutes ago',
+        read: false,
+        icon: MapPin,
+        color: 'text-success'
+    },
+    {
+        id: 2,
+        type: 'info',
+        title: 'System Maintenance',
+        message: 'Scheduled maintenance will occur tonight at 2 AM',
+        time: '1 hour ago',
+        read: false,
+        icon: Info,
+        color: 'text-info'
+    },
+    {
+        id: 3,
+        type: 'warning',
+        title: 'Data Sync Alert',
+        message: 'Some tracking data may be delayed due to network issues',
+        time: '3 hours ago',
+        read: true,
+        icon: AlertTriangle,
+        color: 'text-warning'
+    }
+]);
+
+const unreadCount = computed(() =>
+    notifications.value.filter(n => !n.read).length
+);
+
+const markAsRead = (id: number) => {
+    const notification = notifications.value.find(n => n.id === id);
+    if (notification) {
+        notification.read = true;
+    }
+};
+
+const markAllAsRead = () => {
+    notifications.value.forEach(n => n.read = true);
+};
+
+const removeNotification = (id: number) => {
+    const index = notifications.value.findIndex(n => n.id === id);
+    if (index > -1) {
+        notifications.value.splice(index, 1);
+    }
+};
+
+const clearAllNotifications = () => {
+    notifications.value = [];
+};
 
 // Theme management with enhanced animation
 const themes = [
@@ -80,6 +148,13 @@ const toggleThemeDropdown = () => {
     }
 };
 
+const toggleNotificationDropdown = () => {
+    isNotificationOpen.value = !isNotificationOpen.value;
+    if (isNotificationOpen.value) {
+        closeOtherDropdowns('notification');
+    }
+};
+
 const toggleSearch = () => {
     isSearchOpen.value = !isSearchOpen.value;
     if (isSearchOpen.value) {
@@ -97,6 +172,7 @@ const closeOtherDropdowns = (except?: string) => {
     if (except !== 'user') isUserDropdownOpen.value = false;
     if (except !== 'theme') isThemeDropdownOpen.value = false;
     if (except !== 'search') isSearchOpen.value = false;
+    if (except !== 'notification') isNotificationOpen.value = false;
 };
 
 const closeAllDropdowns = () => {
@@ -159,11 +235,11 @@ onUnmounted(() => {
     mediaQuery.removeEventListener('change', handleSystemThemeChange);
 });
 
-// Navigation items with icons
+// Navigation items with icons (Map item removed)
 const navigationItems = [
     { name: 'Home', href: '#', authOnly: false },
     { name: 'About', href: '#', authOnly: false },
-    { name: 'Map', href: '#', authOnly: false, icon: Sparkles },
+    { name: 'Map', href: '#', authOnly: false },
     { name: 'Statistik', href: '#', authOnly: true },
     { name: 'Laporan', href: '#', authOnly: true },
 ];
@@ -177,8 +253,8 @@ const userMenuItems = [
     <!-- Ultra Modern Glassmorphic Navbar -->
     <div class="navbar bg-base-100/60 backdrop-blur-xl border-b border-base-content/10 fixed top-0 z-50 shadow-2xl shadow-base-content/5">
         <div class="navbar-start">
-            <!-- Mobile menu button with enhanced animation -->
-            <div class="lg:hidden">
+            <!-- Mobile menu button with enhanced animation (only show if user exists) -->
+            <div class="lg:hidden" v-if="user">
                 <button
                     @click="toggleMobileMenu"
                     class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95"
@@ -225,14 +301,13 @@ const userMenuItems = [
                                     class="btn btn-ghost w-full justify-start gap-3 text-lg hover:bg-base-content/10 transition-all duration-300"
                                     @click="closeAllDropdowns"
                                 >
-                                    <component v-if="item.icon" :is="item.icon" class="w-5 h-5" />
                                     {{ item.name }}
                                 </Link>
                             </template>
                         </div>
 
-                        <!-- Theme selector -->
-                        <div class="space-y-2">
+                        <!-- Theme selector (only if user exists) -->
+                        <div class="space-y-2" v-if="user">
                             <p class="text-sm font-medium opacity-70">Theme</p>
                             <div class="grid grid-cols-3 gap-2">
                                 <button
@@ -271,14 +346,6 @@ const userMenuItems = [
                                     Sign Out
                                 </button>
                             </template>
-                            <template v-else>
-                                <Link :href="route('login')" class="btn btn-ghost w-full" @click="closeAllDropdowns">
-                                    Sign In
-                                </Link>
-                                <Link :href="route('register')" class="btn btn-primary w-full" @click="closeAllDropdowns">
-                                    Get Started
-                                </Link>
-                            </template>
                         </div>
                     </div>
                 </div>
@@ -287,29 +354,28 @@ const userMenuItems = [
             <!-- Enhanced Brand/Logo -->
             <Link
                 :href="user ? route('user.dashboard') : '/'"
-                class="btn btn-ghost hover:bg-transparent group transition-all duration-300 px-2"
+                class="btn btn-ghost hover:bg-transparent group transition-all duration-300 px-2 ml-10"
             >
-            <div class="ml-2 px-2 py-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full group-hover:from-primary/30 group-hover:to-secondary/30 transition-all duration-300">
-                    <span class="text-lg font-bold text-primary  transition-colors duration-300">
+                <div class="ml-2 px-2 py-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full group-hover:from-primary/30 group-hover:to-secondary/30 transition-all duration-300">
+                    <span class="text-lg font-bold text-primary transition-colors duration-300">
                         Go
                     </span>
                 </div>
-                <span class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text  group-hover:scale-105 transition-all duration-300 tracking-tight">
+                <span class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text group-hover:scale-105 transition-all duration-300 tracking-tight">
                     Tracking
                 </span>
             </Link>
         </div>
 
-        <!-- Desktop Navigation with enhanced styling -->
+        <!-- Desktop Navigation with enhanced styling and centered layout -->
         <div class="navbar-center hidden lg:flex">
-            <ul class="menu menu-horizontal gap-1">
+            <ul class="menu menu-horizontal gap-2">
                 <template v-for="item in navigationItems" :key="item.name">
                     <li v-if="!item.authOnly || user">
                         <Link
                             :href="item.href.startsWith('#') ? item.href : route(item.href)"
-                            class="font-medium hover:bg-base-content/10 transition-all duration-300 rounded-xl gap-2 hover:scale-105 active:scale-95"
+                            class="font-medium hover:bg-base-content/10 transition-all duration-300 rounded-xl hover:scale-105 active:scale-95 px-4"
                         >
-                            <component v-if="item.icon" :is="item.icon" class="w-4 h-4" />
                             {{ item.name }}
                         </Link>
                     </li>
@@ -318,8 +384,8 @@ const userMenuItems = [
         </div>
 
         <div class="navbar-end gap-2">
-            <!-- Enhanced Search -->
-            <div class="relative">
+            <!-- Enhanced Search (only show if user exists) -->
+            <div class="relative" v-if="user">
                 <!-- Search toggle button -->
                 <button
                     @click="toggleSearch"
@@ -376,17 +442,134 @@ const userMenuItems = [
                 </div>
             </div>
 
-            <!-- Notifications (if user is authenticated) -->
-            <button
-                v-if="user"
-                class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 indicator"
-            >
-                <span class="indicator-item badge badge-secondary badge-xs"></span>
-                <Bell class="w-5 h-5" />
-            </button>
+            <!-- Enhanced Notifications with Dropdown (if user is authenticated) -->
+            <div class="relative" v-if="user">
+                <button
+                    @click="toggleNotificationDropdown"
+                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 indicator"
+                    :class="{ 'bg-base-content/10': isNotificationOpen }"
+                >
+                    <span
+                        v-if="unreadCount > 0"
+                        class="indicator-item badge badge-secondary badge-xs animate-pulse"
+                    >
+                        {{ unreadCount > 9 ? '9+' : unreadCount }}
+                    </span>
+                    <Bell class="w-5 h-5" :class="{ 'animate-bounce': unreadCount > 0 }" />
+                </button>
 
-            <!-- Enhanced Theme Toggle -->
-            <div class="relative">
+                <!-- Notification Dropdown -->
+                <div
+                    v-if="isNotificationOpen"
+                    class="navbar-dropdown absolute right-0 top-full mt-2 w-96 bg-base-100/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-base-content/10 animate-scale-in max-h-96 overflow-hidden"
+                >
+                    <!-- Header -->
+                    <div class="flex items-center justify-between p-4 border-b border-base-content/10">
+                        <div class="flex items-center gap-2">
+                            <Bell class="w-5 h-5" />
+                            <h3 class="font-bold text-lg">Notifications</h3>
+                            <span v-if="unreadCount > 0" class="badge badge-secondary badge-sm">
+                                {{ unreadCount }}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                v-if="unreadCount > 0"
+                                @click="markAllAsRead"
+                                class="btn btn-ghost btn-xs hover:bg-base-content/10"
+                                title="Mark all as read"
+                            >
+                                <Check class="w-4 h-4" />
+                            </button>
+                            <button
+                                v-if="notifications.length > 0"
+                                @click="clearAllNotifications"
+                                class="btn btn-ghost btn-xs hover:bg-error/10 text-error"
+                                title="Clear all"
+                            >
+                                <X class="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Notifications List -->
+                    <div class="max-h-80 overflow-y-auto">
+                        <template v-if="notifications.length > 0">
+                            <div
+                                v-for="notification in notifications"
+                                :key="notification.id"
+                                class="p-4 border-b border-base-content/5 hover:bg-base-content/5 transition-all duration-200 group"
+                                :class="{ 'bg-primary/5': !notification.read }"
+                            >
+                                <div class="flex items-start gap-3">
+                                    <!-- Icon -->
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-1"
+                                         :class="notification.read ? 'bg-base-content/10' : 'bg-primary/20'">
+                                        <component
+                                            :is="notification.icon"
+                                            class="w-4 h-4"
+                                            :class="notification.read ? 'text-base-content/60' : notification.color"
+                                        />
+                                    </div>
+
+                                    <!-- Content -->
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <h4 class="font-semibold text-sm truncate"
+                                                :class="notification.read ? 'text-base-content/80' : 'text-base-content'">
+                                                {{ notification.title }}
+                                            </h4>
+                                            <div class="flex items-center gap-1 flex-shrink-0">
+                                                <div v-if="!notification.read" class="w-2 h-2 bg-primary rounded-full"></div>
+                                                <button
+                                                    @click="removeNotification(notification.id)"
+                                                    class="btn btn-ghost btn-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-error/10 text-error"
+                                                >
+                                                    <X class="w-3 h-3" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm mt-1 line-clamp-2"
+                                           :class="notification.read ? 'text-base-content/60' : 'text-base-content/80'">
+                                            {{ notification.message }}
+                                        </p>
+                                        <div class="flex items-center justify-between mt-2">
+                                            <div class="flex items-center gap-1 text-xs text-base-content/50">
+                                                <Clock class="w-3 h-3" />
+                                                {{ notification.time }}
+                                            </div>
+                                            <button
+                                                v-if="!notification.read"
+                                                @click="markAsRead(notification.id)"
+                                                class="btn btn-ghost btn-xs hover:bg-primary/10 text-primary"
+                                            >
+                                                Mark as read
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Empty state -->
+                        <div v-else class="p-8 text-center">
+                            <Bell class="w-12 h-12 mx-auto text-base-content/30 mb-4" />
+                            <h3 class="font-semibold text-base-content/60 mb-2">No notifications</h3>
+                            <p class="text-sm text-base-content/50">You're all caught up! Check back later for updates.</p>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div v-if="notifications.length > 0" class="p-3 border-t border-base-content/10">
+                        <button class="btn btn-ghost btn-sm w-full hover:bg-base-content/10">
+                            View All Notifications
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Theme Toggle (only show if user exists) -->
+            <div class="relative" v-if="user">
                 <button
                     @click="toggleThemeDropdown"
                     class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95"
@@ -416,7 +599,7 @@ const userMenuItems = [
             </div>
 
             <!-- Enhanced User Menu -->
-            <div v-if="user" class="relative">
+            <div v-if="user" class="relative mr-10">
                 <button
                     @click="toggleUserDropdown"
                     class="navbar-btn btn btn-ghost btn-circle avatar hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 p-1"
@@ -487,14 +670,16 @@ const userMenuItems = [
                 </div>
             </div>
 
-            <!-- Enhanced Guest Actions -->
+            <!-- Enhanced Guest Actions (centered when no user) -->
             <template v-else>
-                <Link :href="route('login')" class="btn btn-sm btn-ghost font-medium hover:bg-base-content/10 transition-all duration-300 hover:scale-105 active:scale-95">
-                    Sign In
-                </Link>
-                <Link :href="route('register')" class="btn btn-sm btn-primary hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg hover:shadow-xl">
-                    Get Started
-                </Link>
+                <div class="flex items-center gap-3 mr-10">
+                    <Link :href="route('login')" class="btn btn-sm btn-ghost font-medium hover:bg-base-content/10 transition-all duration-300 hover:scale-105 active:scale-95">
+                        Sign In
+                    </Link>
+                    <Link :href="route('register')" class="btn btn-sm btn-primary hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg hover:shadow-xl">
+                        Get Started
+                    </Link>
+                </div>
             </template>
         </div>
     </div>
