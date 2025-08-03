@@ -231,17 +231,18 @@ onMounted(() => {
 
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
+
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     mediaQuery.removeEventListener('change', handleSystemThemeChange);
 });
 
-// Navigation items with icons (Map item removed)
+// Navigation items with icons
 const navigationItems = [
-    { name: 'Home', href: '#', authOnly: false },
-    { name: 'About', href: '#', authOnly: false },
-    { name: 'Map', href: '#', authOnly: false },
-    { name: 'Statistik', href: '#', authOnly: true },
-    { name: 'Laporan', href: '#', authOnly: true },
+    { name: 'Home', href: 'user.dashboard', authOnly: false },
+    { name: 'About', href: 'user.about', authOnly: false },
+    { name: 'Map', href: 'user.map', authOnly: false },
+    { name: 'Statistik', href: 'user.statistic', authOnly: true },
+    { name: 'Laporan', href: 'user.report', authOnly: true },
 ];
 
 const userMenuItems = [
@@ -250,18 +251,18 @@ const userMenuItems = [
 </script>
 
 <template>
-    <!-- Ultra Modern Glassmorphic Navbar -->
+    <!-- Ultra Modern Glassmorphic Navbar (Fixed Position) -->
     <div class="navbar bg-base-100/60 backdrop-blur-xl border-b border-base-content/10 fixed top-0 z-50 shadow-2xl shadow-base-content/5">
         <div class="navbar-start">
             <!-- Mobile menu button with enhanced animation (only show if user exists) -->
             <div class="lg:hidden" v-if="user">
                 <button
                     @click="toggleMobileMenu"
-                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95"
+                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 text-base-content"
                     :class="{ 'bg-base-content/10': isMobileMenuOpen }"
                 >
-                    <Menu v-if="!isMobileMenuOpen" class="w-5 h-5 transition-transform duration-300" />
-                    <X v-else class="w-5 h-5 transition-transform duration-300 rotate-90" />
+                    <Menu v-if="!isMobileMenuOpen" class="w-5 h-5 transition-transform duration-300 text-base-content" />
+                    <X v-else class="w-5 h-5 transition-transform duration-300 rotate-90 text-base-content" />
                 </button>
 
                 <!-- Enhanced Mobile Sliding Menu -->
@@ -284,8 +285,8 @@ const userMenuItems = [
                                         </div>
                                     </div>
                                     <div class="flex-1">
-                                        <h3 class="font-bold text-lg">{{ user.name }}</h3>
-                                        <p class="text-sm opacity-70">{{ user.email }}</p>
+                                        <h3 class="font-bold text-lg text-base-content">{{ user.name }}</h3>
+                                        <p class="text-sm text-base-content/70">{{ user.email }}</p>
                                         <div class="badge badge-primary badge-sm mt-1 capitalize">{{ user.role }}</div>
                                     </div>
                                 </div>
@@ -298,7 +299,7 @@ const userMenuItems = [
                                 <Link
                                     v-if="!item.authOnly || user"
                                     :href="item.href.startsWith('#') ? item.href : route(item.href)"
-                                    class="btn btn-ghost w-full justify-start gap-3 text-lg hover:bg-base-content/10 transition-all duration-300"
+                                    class="btn btn-ghost w-full justify-start gap-3 text-lg hover:bg-base-content/10 transition-all duration-300 text-base-content"
                                     @click="closeAllDropdowns"
                                 >
                                     {{ item.name }}
@@ -308,13 +309,13 @@ const userMenuItems = [
 
                         <!-- Theme selector (only if user exists) -->
                         <div class="space-y-2" v-if="user">
-                            <p class="text-sm font-medium opacity-70">Theme</p>
+                            <p class="text-sm font-medium text-base-content/70">Theme</p>
                             <div class="grid grid-cols-3 gap-2">
                                 <button
                                     v-for="theme in themes"
                                     :key="theme.value"
                                     @click="toggleTheme(theme.value)"
-                                    class="btn btn-sm gap-2 transition-all duration-300"
+                                    class="btn btn-sm gap-2 transition-all duration-300 text-base-content"
                                     :class="currentTheme === theme.value
                                         ? 'btn-primary'
                                         : 'btn-ghost hover:bg-base-content/10'"
@@ -332,7 +333,7 @@ const userMenuItems = [
                                     v-for="item in userMenuItems"
                                     :key="item.name"
                                     :href="route(item.href)"
-                                    class="btn btn-ghost w-full justify-start gap-3"
+                                    class="btn btn-ghost w-full justify-start gap-3 text-base-content"
                                     @click="closeAllDropdowns"
                                 >
                                     <component :is="item.icon" class="w-5 h-5" />
@@ -357,11 +358,11 @@ const userMenuItems = [
                 class="btn btn-ghost hover:bg-transparent group transition-all duration-300 px-2 ml-10"
             >
                 <div class="ml-2 px-2 py-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full group-hover:from-primary/30 group-hover:to-secondary/30 transition-all duration-300">
-                    <span class="text-lg font-bold text-primary transition-colors duration-300">
+                    <span class="text-lg font-bold text-base-content transition-colors duration-300 ">
                         Go
                     </span>
                 </div>
-                <span class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text group-hover:scale-105 transition-all duration-300 tracking-tight">
+                <span class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text group-hover:scale-105 transition-all duration-300 tracking-tight text-base-content">
                     Tracking
                 </span>
             </Link>
@@ -374,7 +375,7 @@ const userMenuItems = [
                     <li v-if="!item.authOnly || user">
                         <Link
                             :href="item.href.startsWith('#') ? item.href : route(item.href)"
-                            class="font-medium hover:bg-base-content/10 transition-all duration-300 rounded-xl hover:scale-105 active:scale-95 px-4"
+                            class="font-medium hover:bg-base-content/10 transition-all duration-300 rounded-xl hover:scale-105 active:scale-95 px-4 text-base-content hover:text-base-content"
                         >
                             {{ item.name }}
                         </Link>
@@ -389,7 +390,7 @@ const userMenuItems = [
                 <!-- Search toggle button -->
                 <button
                     @click="toggleSearch"
-                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 lg:hidden"
+                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 lg:hidden text-base-content"
                     :class="{ 'bg-base-content/10': isSearchOpen }"
                 >
                     <Search class="w-5 h-5" />
@@ -403,7 +404,7 @@ const userMenuItems = [
                                 v-model="searchQuery"
                                 type="text"
                                 placeholder="Search..."
-                                class="input input-sm w-32 bg-base-100/50 backdrop-blur-sm border-base-content/20 focus:border-primary focus:w-64 transition-all duration-300 mr-5"
+                                class="input input-sm w-32 bg-base-100/50 backdrop-blur-sm border-base-content/20 focus:border-primary focus:w-64 transition-all duration-300 mr-5 text-base-content placeholder:text-base-content/50"
                                 @keyup.enter="handleSearch"
                             />
                             <button
@@ -428,7 +429,7 @@ const userMenuItems = [
                                 v-model="searchQuery"
                                 type="text"
                                 placeholder="Search anything..."
-                                class="input input-bordered w-full bg-base-100/50 backdrop-blur-sm border-base-content/20 focus:border-primary"
+                                class="input input-bordered w-full bg-base-100/50 backdrop-blur-sm border-base-content/20 focus:border-primary text-base-content placeholder:text-base-content/50"
                                 @keyup.enter="handleSearch"
                             />
                             <button
@@ -446,7 +447,7 @@ const userMenuItems = [
             <div class="relative" v-if="user">
                 <button
                     @click="toggleNotificationDropdown"
-                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 indicator"
+                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 indicator text-base-content"
                     :class="{ 'bg-base-content/10': isNotificationOpen }"
                 >
                     <span
@@ -466,8 +467,8 @@ const userMenuItems = [
                     <!-- Header -->
                     <div class="flex items-center justify-between p-4 border-b border-base-content/10">
                         <div class="flex items-center gap-2">
-                            <Bell class="w-5 h-5" />
-                            <h3 class="font-bold text-lg">Notifications</h3>
+                            <Bell class="w-5 h-5 text-base-content" />
+                            <h3 class="font-bold text-lg text-base-content">Notifications</h3>
                             <span v-if="unreadCount > 0" class="badge badge-secondary badge-sm">
                                 {{ unreadCount }}
                             </span>
@@ -476,7 +477,7 @@ const userMenuItems = [
                             <button
                                 v-if="unreadCount > 0"
                                 @click="markAllAsRead"
-                                class="btn btn-ghost btn-xs hover:bg-base-content/10"
+                                class="btn btn-ghost btn-xs hover:bg-base-content/10 text-base-content"
                                 title="Mark all as read"
                             >
                                 <Check class="w-4 h-4" />
@@ -561,7 +562,7 @@ const userMenuItems = [
 
                     <!-- Footer -->
                     <div v-if="notifications.length > 0" class="p-3 border-t border-base-content/10">
-                        <button class="btn btn-ghost btn-sm w-full hover:bg-base-content/10">
+                        <button class="btn btn-ghost btn-sm w-full hover:bg-base-content/10 text-base-content">
                             View All Notifications
                         </button>
                     </div>
@@ -572,7 +573,7 @@ const userMenuItems = [
             <div class="relative" v-if="user">
                 <button
                     @click="toggleThemeDropdown"
-                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95"
+                    class="navbar-btn btn btn-ghost btn-circle hover:bg-base-content/10 transition-all duration-300 hover:scale-110 active:scale-95 text-base-content"
                     :class="{ 'bg-base-content/10': isThemeDropdownOpen }"
                 >
                     <component :is="themes.find(t => t.value === currentTheme)?.icon || Monitor" class="w-5 h-5" />
@@ -586,7 +587,7 @@ const userMenuItems = [
                         v-for="theme in themes"
                         :key="theme.value"
                         @click="toggleTheme(theme.value)"
-                        class="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 hover:bg-base-content/10"
+                        class="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 hover:bg-base-content/10 text-base-content"
                         :class="currentTheme === theme.value ? 'bg-primary text-primary-content' : ''"
                     >
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center"
@@ -630,8 +631,8 @@ const userMenuItems = [
                             </div>
                         </div>
                         <div class="flex-1">
-                            <h3 class="font-bold">{{ user.name }}</h3>
-                            <p class="text-sm opacity-70">{{ user.email }}</p>
+                            <h3 class="font-bold text-base-content">{{ user.name }}</h3>
+                            <p class="text-sm text-base-content/70">{{ user.email }}</p>
                             <div class="badge badge-primary badge-sm mt-1 capitalize">{{ user.role }}</div>
                         </div>
                     </div>
@@ -649,8 +650,8 @@ const userMenuItems = [
                                 <component :is="item.icon" class="w-4 h-4" />
                             </div>
                             <div class="flex-1">
-                                <p class="font-medium">{{ item.name }}</p>
-                                <p class="text-xs opacity-60">{{ item.desc }}</p>
+                                <p class="font-medium text-base-content">{{ item.name }}</p>
+                                <p class="text-xs text-base-content/60">{{ item.desc }}</p>
                             </div>
                         </Link>
                     </div>
@@ -672,11 +673,11 @@ const userMenuItems = [
 
             <!-- Enhanced Guest Actions (centered when no user) -->
             <template v-else>
-                <div class="flex items-center gap-3 mr-10">
-                    <Link :href="route('login')" class="btn btn-sm btn-ghost font-medium hover:bg-base-content/10 transition-all duration-300 hover:scale-105 active:scale-95">
+                <div class="flex items-center gap-3 mr-10 text-base-content">
+                    <Link :href="route('login')" class="btn btn-sm btn-ghost font-medium hover:bg-base-content/10 transition-all duration-300 hover:scale-105 active:scale-95 ">
                         Sign In
                     </Link>
-                    <Link :href="route('register')" class="btn btn-sm btn-primary hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    <Link :href="route('register')" class="btn btn-sm btn-primary hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg hover:shadow-xl ">
                         Get Started
                     </Link>
                 </div>

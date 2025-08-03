@@ -9,9 +9,25 @@ Route::get('/', function () {
 })->name('user.dashboard');
 
 // User Dashboard Route
-Route::get('user/dashboard', function () {
+Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified', 'role:user'])->name('user.dashboard');
+
+Route::get('/about', function () {
+    return Inertia::render('user/About');
+})->name('user.about');
+
+Route::get('/map', function () {
+    return Inertia::render('user/Map');
+})->name('user.map');
+
+Route::get('/statistic', function () {
+    return Inertia::render('user/Statistic');
+})->name('user.statistic');
+
+Route::get('/report', function () {
+    return Inertia::render('user/Report');
+})->name('user.report');
 
 // Admin Dashboard Route
 Route::get('admin/dashboard', function () {

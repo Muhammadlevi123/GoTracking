@@ -1,0 +1,3 @@
+<template>
+    ini map
+</template>

@@ -1,0 +1,3 @@
+<template>
+    ini report
+</template>
