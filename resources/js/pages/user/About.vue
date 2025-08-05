@@ -2,6 +2,7 @@
 import { Head } from '@inertiajs/vue3';
 import NavUser from '@/components/NavUser.vue';
 import { onMounted } from 'vue';
+import FooterUser from '../../components/footerUser.vue';
 
 onMounted(() => {
     const savedTheme = localStorage.getItem('theme') || 'system';
@@ -70,47 +71,9 @@ onMounted(() => {
             </div>
         </main>
 
-        <footer class="bg-neutral text-neutral-content py-12 transition-colors duration-300">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                    <div class="col-span-1 md:col-span-2">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                                <span class="text-primary-content font-bold text-lg">GT</span>
-                            </div>
-                            <span class="text-xl font-bold">GoTracking</span>
-                        </div>
-                        <p class="text-neutral-content/70 mb-4 max-w-md transition-colors duration-300">
-                            Platform keamanan pengendara terpercaya di Indonesia. Aman, akurat, dan selalu siaga.
-                        </p>
-                    </div>
+        <!-- footer -->
+        <FooterUser />
 
-                    <div>
-                        <h4 class="font-semibold mb-4">Fitur</h4>
-                        <ul class="space-y-2 text-neutral-content/70">
-                            <li><a href="#" class="hover:text-neutral-content transition-colors duration-300">Deteksi Kecelakaan</a></li>
-                            <li><a href="#" class="hover:text-neutral-content transition-colors duration-300">Notifikasi Darurat</a></li>
-                            <li><a href="#" class="hover:text-neutral-content transition-colors duration-300">Pelacakan Lokasi</a></li>
-                            <li><a href="#" class="hover:text-neutral-content transition-colors duration-300">Dashboard</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 class="font-semibold mb-4">Kontak</h4>
-                        <ul class="space-y-2 text-neutral-content/70">
-                            <li><a href="#" class="hover:text-neutral-content transition-colors duration-300">Bantuan</a></li>
-                            <li><a href="#" class="hover:text-neutral-content transition-colors duration-300">Tim Kami</a></li>
-                            <li><a href="#" class="hover:text-neutral-content transition-colors duration-300">Karir</a></li>
-                            <li><a href="#" class="hover:text-neutral-content transition-colors duration-300">Hubungi Kami</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="border-t border-neutral-content/20 pt-8 text-center text-neutral-content/60 transition-colors duration-300">
-                    <p>&copy; 2025 GoTracking Indonesia. Semua hak cipta dilindungi.</p>
-                </div>
-            </div>
-        </footer>
     </div>
 </template>
 
