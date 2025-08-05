@@ -21,8 +21,8 @@ Route::get('/map', function () {
     return Inertia::render('user/Map');
 })->name('user.map');
 
-Route::get('/statistic', function () {
-    return Inertia::render('user/Statistic');
+Route::get('/statistik', function () {
+    return Inertia::render('user/statistik/Dashboard');
 })->name('user.statistic');
 
 Route::get('/report', function () {

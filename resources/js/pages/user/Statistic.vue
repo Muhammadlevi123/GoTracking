@@ -1,3 +1,0 @@
-<template>
-    ini statistic
-</template>
