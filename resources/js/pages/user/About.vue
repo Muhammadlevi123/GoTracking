@@ -42,10 +42,10 @@ onMounted(() => {
                 <!-- Future Vision -->
                 <div class="mb-16">
                     <h3 class="text-2xl font-bold text-base-content mb-6 transition-colors duration-300">
-                        GoTracking - Masa Depan Keselamatan Pengendara di Indonesia
+                        Masa Depan Keselamatan Pengendara di Indonesia
                     </h3>
                     <p class="text-base-content/80 text-lg leading-relaxed transition-colors duration-300 mb-6">
-                        GoTracking tersedia dalam versi aplikasi mobile dan web dengan antarmuka modern yang mudah digunakan. Platform ini didukung oleh teknologi cloud yang andal, notifikasi instan, serta desain berbasis user-centered yang memberikan pengalaman terbaik bagi pengguna.
+                        GoTracking tersedia dalam aplikasi website dengan antarmuka modern yang mudah digunakan. Platform ini didukung oleh teknologi cloud yang andal, notifikasi instan, serta desain berbasis user-centered yang memberikan pengalaman terbaik bagi pengguna.
                     </p>
                     <p class="text-base-content/80 text-lg leading-relaxed transition-colors duration-300">
                         GoTracking berkomitmen membantu pemerintah dan masyarakat menciptakan budaya berkendara aman, serta mendukung target penurunan angka kecelakaan lalu lintas di Indonesia.
