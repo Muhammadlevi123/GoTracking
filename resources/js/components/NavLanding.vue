@@ -30,6 +30,12 @@ const isNotificationOpen = ref(false);
 const currentTheme = ref('system');
 const searchQuery = ref('');
 
+// Navbar scroll effect
+const isScrolled = ref(false);
+const handleScroll = () => {
+    isScrolled.value = window.scrollY > 50;
+};
+
 // Notification system
 const notifications = ref([
     {
@@ -212,6 +218,7 @@ const handleSystemThemeChange = (e: MediaQueryListEvent) => {
 onMounted(() => {
     initializeTheme();
     document.addEventListener('click', handleClickOutside);
+    window.addEventListener('scroll', handleScroll);
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     mediaQuery.addEventListener('change', handleSystemThemeChange);
@@ -226,6 +233,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
+    window.removeEventListener('scroll', handleScroll);
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     mediaQuery.removeEventListener('change', handleSystemThemeChange);
@@ -268,8 +276,9 @@ const userMenuItems = [
 <template>
     <!-- Full Screen Background Image Container -->
     <div class="hero-background">
-        <!-- Ultra Modern Glassmorphic Navbar (Fixed Position Konsisten) -->
-        <div class="navbar-glass fixed top-0 z-50 w-full bg-black/70 backdrop-blur-xl border-b border-white/20 shadow-2xl">
+        <!-- Ultra Modern Glassmorphic Navbar (Fixed Position with Enhanced Transparency) -->
+        <div class="navbar-glass fixed top-0 z-50 w-full transition-all duration-500"
+             :class="isScrolled ? 'bg-black/70 backdrop-blur-xl border-b border-white/20 shadow-2xl' : 'bg-transparent backdrop-blur-sm'">
             <div class="container mx-auto px-4">
                 <div class="navbar">
                     <div class="navbar-start">

@@ -1,6 +1,6 @@
 <template>
     <!-- Footer -->
-    <footer id="footer" class="bg-neutral text-neutral-content transition-colors duration-300">
+    <footer id="footer" class="bg-black/90 text-neutral-content transition-colors duration-300">
         <div class="footer-legal text-center py-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col lg:flex-row justify-center lg:justify-between items-center">

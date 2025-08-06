@@ -2,7 +2,7 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import NavUser from '../../components/NavUser.vue';
 import { ref, onMounted, watch, nextTick } from 'vue';
-import FooterUser from '../../components/footerUser.vue';
+import FooterUser from '@/components/FooterUser.vue';
 
 // Constants
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -268,7 +268,7 @@ const getSeverityColor = (severity: string): string => {
         <NavUser />
 
         <!-- Main Content -->
-        <main class="pt-20 pb-20">
+        <main class="pt-40 pb-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 <!-- Header Section -->
@@ -298,7 +298,7 @@ const getSeverityColor = (severity: string): string => {
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                                                     </svg>
                                                     <div>
-                                                        <div class="font-medium">Kondisi Jalan</div>
+                                                        <div class="font-medium text-base-content">Kondisi Jalan</div>
                                                         <div class="text-sm text-base-content/60">Jalan rusak, berlubang, dll</div>
                                                     </div>
                                                 </div>
@@ -313,7 +313,7 @@ const getSeverityColor = (severity: string): string => {
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
                                                     <div>
-                                                        <div class="font-medium">Kecelakaan</div>
+                                                        <div class="font-medium text-base-content">Kecelakaan</div>
                                                         <div class="text-sm text-base-content/60">Kecelakaan lalu lintas</div>
                                                     </div>
                                                 </div>
@@ -329,7 +329,7 @@ const getSeverityColor = (severity: string): string => {
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     </svg>
                                                     <div>
-                                                        <div class="font-medium">Wilayah Baru</div>
+                                                        <div class="font-medium text-base-content">Wilayah Baru</div>
                                                         <div class="text-sm text-base-content/60">Tambah area monitoring</div>
                                                     </div>
                                                 </div>
@@ -342,7 +342,7 @@ const getSeverityColor = (severity: string): string => {
                                 <div>
                                     <label class="block text-sm font-medium text-base-content mb-3">Lokasi Kejadian</label>
                                     <div class="space-y-4">
-                                        <div class="relative">
+                                        <div class="relative text-base-content">
                                             <input type="text" v-model="form.location" placeholder="Masukkan nama jalan atau alamat lengkap..." class="input input-bordered w-full pr-12 focus:input-primary transition-all duration-300" required>
                                             <button type="button" @click="getCurrentLocation" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-base-content/50 hover:text-primary transition-colors duration-300">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -384,7 +384,7 @@ const getSeverityColor = (severity: string): string => {
                                 <!-- Kategori Jalan -->
                                 <div>
                                     <label class="block text-sm font-medium text-base-content mb-3">Kategori Jalan</label>
-                                    <select v-model="form.category" class="select select-bordered w-full focus:select-primary transition-all duration-300">
+                                    <select v-model="form.category" class="select select-bordered w-full focus:select-primary transition-all duration-300 text-base-content">
                                         <option value="jalan_raya">Jalan Raya</option>
                                         <option value="jalan_tol">Jalan Tol</option>
                                         <option value="jalan_provinsi">Jalan Provinsi</option>
@@ -400,7 +400,7 @@ const getSeverityColor = (severity: string): string => {
                                 <!-- Kondisi Jalan (dropdown) -->
                                 <div v-if="form.report_type === 'road_condition'">
                                     <label class="block text-sm font-medium text-base-content mb-3">Kondisi Jalan</label>
-                                    <select v-model="form.road_condition" class="select select-bordered w-full focus:select-primary transition-all duration-300">
+                                    <select v-model="form.road_condition" class="select select-bordered w-full focus:select-primary transition-all duration-300 text-base-content">
                                         <option value="baik">Baik</option>
                                         <option value="rusak_ringan">Rusak Ringan</option>
                                         <option value="rusak_berat">Rusak Berat</option>
@@ -411,7 +411,7 @@ const getSeverityColor = (severity: string): string => {
                                 <!-- Tingkat Keparahan (dropdown) -->
                                 <div>
                                     <label class="block text-sm font-medium text-base-content mb-3">Tingkat Keparahan</label>
-                                    <select v-model="form.severity_level" class="select select-bordered w-full focus:select-primary transition-all duration-300">
+                                    <select v-model="form.severity_level" class="select select-bordered w-full focus:select-primary transition-all duration-300 text-base-content">
                                         <option value="rendah">Rendah - Tidak mengganggu</option>
                                         <option value="sedang">Sedang - Sedikit mengganggu</option>
                                         <option value="tinggi">Tinggi - Sangat mengganggu</option>
@@ -422,7 +422,7 @@ const getSeverityColor = (severity: string): string => {
                                 <!-- Deskripsi Detail -->
                                 <div>
                                     <label class="block text-sm font-medium text-base-content mb-3">Deskripsi Detail</label>
-                                    <textarea v-model="form.description" rows="4" placeholder="Jelaskan kondisi secara detail... (opsional)" class="textarea textarea-bordered w-full focus:textarea-primary transition-all duration-300 resize-none"></textarea>
+                                    <textarea v-model="form.description" rows="4" placeholder="Jelaskan kondisi secara detail... (opsional)" class="textarea textarea-bordered w-full focus:textarea-primary transition-all duration-300 resize-none text-base-content"></textarea>
                                     <div class="text-xs text-base-content/50 mt-2">
                                         Contoh: "Jalan berlubang besar di tengah jalan, diameter sekitar 2 meter, kedalaman 30cm. Sangat berbahaya untuk motor."
                                     </div>
@@ -438,7 +438,7 @@ const getSeverityColor = (severity: string): string => {
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                             </svg>
                                             <div class="text-base-content/60 text-sm">
-                                                <span class="font-medium text-primary">Klik untuk upload</span>
+                                                <span class="font-medium  text-base-content">Klik untuk upload</span>
                                             </div>
                                             <div class="text-xs text-base-content/40 mt-1">PNG, JPG hingga 10MB</div>
                                         </label>

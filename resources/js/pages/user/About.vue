@@ -2,7 +2,7 @@
 import { Head } from '@inertiajs/vue3';
 import NavUser from '@/components/NavUser.vue';
 import { onMounted } from 'vue';
-import FooterUser from '../../components/footerUser.vue';
+import FooterUser from '@/components/FooterUser.vue';
 
 onMounted(() => {
     const savedTheme = localStorage.getItem('theme') || 'system';
@@ -18,15 +18,17 @@ onMounted(() => {
 </script>
 
 <template>
+
     <Head title="Tentang GoTracking - Platform Keamanan Pengendara">
         <link rel="preconnect" href="https://rsms.me/" />
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     </Head>
 
-    <div class="min-h-screen bg-gradient-to-br from-base-200 via-base-100 to-base-200 transition-all duration-300">
+    <div class=" bg-gradient-to-br from-base-200 via-base-100 to-base-200 transition-all duration-300 ">
+
         <NavUser />
 
-        <main class="py-16 sm:py-24 bg-base-100 transition-colors duration-300">
+        <main class="sm:py-24 bg-base-100 transition-colors duration-300 mt-12">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 <!-- Platform Overview -->
@@ -35,7 +37,10 @@ onMounted(() => {
                         GoTracking - Platform Keamanan Pengendara Terdepan di Indonesia
                     </h3>
                     <p class="text-base-content/80 text-lg leading-relaxed transition-colors duration-300 mb-6">
-                        GoTracking adalah platform navigasi online yang dapat digunakan untuk memilih jalan berkendara yang paling optimal, dengan kerusakan jalan yang minimal dan keamanan jalan berdasarkan data historis kecelakaan. Data keamanan jalan dinilai berdasarkan tingkat kerusakan, data historis kecelakaan, dan survey kondisi jalan secara berkala.
+                        GoTracking adalah platform navigasi online yang dapat digunakan untuk memilih jalan berkendara
+                        yang paling optimal, dengan kerusakan jalan yang minimal dan keamanan jalan berdasarkan data
+                        historis kecelakaan. Data keamanan jalan dinilai berdasarkan tingkat kerusakan, data historis
+                        kecelakaan, dan survey kondisi jalan secara berkala.
                     </p>
                 </div>
 
@@ -45,12 +50,25 @@ onMounted(() => {
                         Masa Depan Keselamatan Pengendara di Indonesia
                     </h3>
                     <p class="text-base-content/80 text-lg leading-relaxed transition-colors duration-300 mb-6">
-                        GoTracking tersedia dalam aplikasi website dengan antarmuka modern yang mudah digunakan. Platform ini didukung oleh teknologi cloud yang andal, notifikasi instan, serta desain berbasis user-centered yang memberikan pengalaman terbaik bagi pengguna.
+                        GoTracking tersedia dalam aplikasi website dengan antarmuka modern yang mudah digunakan.
+                        Platform ini didukung oleh teknologi cloud yang andal, notifikasi instan, serta desain berbasis
+                        user-centered yang memberikan pengalaman terbaik bagi pengguna.
                     </p>
                     <p class="text-base-content/80 text-lg leading-relaxed transition-colors duration-300">
-                        GoTracking berkomitmen membantu pemerintah dan masyarakat menciptakan budaya berkendara aman, serta mendukung target penurunan angka kecelakaan lalu lintas di Indonesia.
+                        GoTracking berkomitmen membantu pemerintah dan masyarakat menciptakan budaya berkendara aman,
+                        serta mendukung target penurunan angka kecelakaan lalu lintas di Indonesia.
                     </p>
                 </div>
+
+                <div class="mb-16">
+                    <h3 class="text-2xl font-bold text-base-content mb-6 transition-colors duration-300">
+                        Solusi Inovatif untuk Perjalanan Lebih Aman
+                    </h3>
+                    <p class="text-base-content/80 text-lg leading-relaxed transition-colors duration-300 mb-6">
+                        GoTracking bukan hanya sekadar alat navigasi, tetapi solusi komprehensif yang menggabungkan analisis data real-time, pembaruan kondisi jalan, dan rekomendasi rute aman. Dengan fitur deteksi dini area rawan kecelakaan dan sistem peringatan kepada pengguna, GoTracking hadir untuk meningkatkan kesadaran dan kewaspadaan pengendara, sehingga setiap perjalanan menjadi lebih nyaman dan terlindungi.
+                    </p>
+                </div>
+
 
             </div>
         </main>
@@ -59,6 +77,8 @@ onMounted(() => {
         <FooterUser />
 
     </div>
+
+
 </template>
 
 <style scoped>
@@ -87,6 +107,7 @@ onMounted(() => {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
