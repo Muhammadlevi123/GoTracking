@@ -35,23 +35,7 @@ onMounted(() => {
                         GoTracking - Platform Keamanan Pengendara Terdepan di Indonesia
                     </h3>
                     <p class="text-base-content/80 text-lg leading-relaxed transition-colors duration-300 mb-6">
-                        GoTracking adalah platform deteksi kecelakaan berbasis teknologi cerdas yang dirancang untuk memberikan rasa aman bagi pengendara di Indonesia. Melalui aplikasi web maupun mobile, GoTracking memanfaatkan sensor ponsel dan algoritma pendeteksi kecelakaan untuk secara otomatis mengenali insiden tabrakan atau jatuh, kemudian mengirim notifikasi darurat ke kontak keluarga, layanan medis, atau pihak berwenang terdekat.
-                    </p>
-                    <p class="text-base-content/80 text-lg leading-relaxed transition-colors duration-300">
-                        Dengan sistem yang terintegrasi, GoTracking hadir sebagai solusi inovatif yang mendukung upaya penyelamatan jiwa, mengurangi risiko keterlambatan penanganan kecelakaan, serta memberikan ketenangan bagi pengguna maupun keluarga mereka.
-                    </p>
-                </div>
-
-                <!-- Services -->
-                <div class="mb-16">
-                    <h3 class="text-2xl font-bold text-base-content mb-6 transition-colors duration-300">
-                        Menyediakan Layanan Keamanan yang Mudah Diakses dan Terjangkau
-                    </h3>
-                    <p class="text-base-content/80 text-lg leading-relaxed transition-colors duration-300 mb-6">
-                        Layanan deteksi kecelakaan otomatis GoTracking dirancang untuk semua kalangan pengguna kendaraan bermotor di Indonesia, baik pengendara sepeda motor, mobil pribadi, hingga layanan transportasi online. Fitur-fitur utama GoTracking mencakup kemampuan mendeteksi kecelakaan secara otomatis melalui sensor akselerometer dan giroskop, mengirim peringatan darurat berupa notifikasi real-time ke kontak darurat yang telah ditentukan, melacak lokasi terkini pengguna secara akurat, serta menyediakan riwayat perjalanan dan catatan insiden yang dapat diakses langsung oleh pengguna.
-                    </p>
-                    <p class="text-base-content/80 text-lg leading-relaxed transition-colors duration-300">
-                        GoTracking juga dilengkapi fitur panggilan cepat ke layanan medis atau nomor darurat nasional, dan dashboard online ramah pengguna dengan laporan serta statistik keselamatan, sehingga seluruh layanan ini terintegrasi untuk memberikan pengalaman berkendara yang lebih aman dan nyaman.
+                        GoTracking adalah platform navigasi online yang dapat digunakan untuk memilih jalan berkendara yang paling optimal, dengan kerusakan jalan yang minimal dan keamanan jalan berdasarkan data historis kecelakaan. Data keamanan jalan dinilai berdasarkan tingkat kerusakan, data historis kecelakaan, dan survey kondisi jalan secara berkala.
                     </p>
                 </div>
 
