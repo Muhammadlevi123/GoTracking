@@ -36,9 +36,10 @@
                         <!-- Logo -->
                         <div class="copyright mb-3">
                             <div class="flex items-center space-x-3 ">
-                                <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center shadow-lg">
-                                    <span class="text-primary-content font-bold text-xl">GT</span>
+                                <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                                    <img src="@/assets/logofooter.png" alt="GoTracking Logo" class="w-10 h-10 object-contain">
                                 </div>
+
                                 <div class="text-left">
                                     <div class="text-xl font-bold text-neutral-content">GoTracking</div>
                                     <div class="text-sm text-neutral-content/60">Indonesia</div>
